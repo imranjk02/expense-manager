@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+{% block title %}Add Transaction | Expense Manager{% endblock %}
+{% block content %}
+
+<div class="card auth-card" style="max-width: 600px;">
+
+    <div style="margin-bottom: 25px;">
+        <h2>Add New Transaction</h2>
+        <p>Enter the details of your income or expense.</p>
+    </div>
+
+    <form method="POST">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <div class="actions">
+
+            <button type="submit">
+                Save Transaction
+            </button>
+
+            <a href="{% url 'expense_list' %}" class="btn"
+               style="background: #64748b;">
+                Cancel
+            </a>
+
+        </div>
+    </form>
+</div>
+{% endblock %}

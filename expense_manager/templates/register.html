@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+{% block title %}Register | Expense Manager{% endblock %}
+{% block content %}
+<div class="card auth-card">
+
+    <div style="text-align: center; margin-bottom: 25px;">
+        <h2>Create Account</h2>
+        <p>Register to manage your income and expenses</p>
+    </div>
+
+    <form method="POST">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Create Account</button>
+    </form>
+
+    <p style="text-align: center; margin-top: 22px;">
+        Already have an account?
+        <a href="{% url 'login' %}">Login Now</a>
+    </p>
+
+</div>
+{% endblock %}

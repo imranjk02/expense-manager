@@ -1,0 +1,92 @@
+{% extends 'base.html' %}
+{% block title %}Dashboard | Expense Manager{% endblock %}
+{% block content %}
+
+<div class="page-header">
+    <h1>Welcome, {{ request.user.username }}!</h1>
+    <p>Here is your financial overview.</p>
+</div>
+
+<div class="grid">
+
+    <div class="card">
+        <h3>Total Income</h3>
+        <div class="amount income">
+            ₹{{ total_income|floatformat:2 }}
+        </div>
+        <p style="margin-top: 8px;">Your total earnings</p>
+    </div>
+
+    <div class="card">
+        <h3>Total Expenses</h3>
+        <div class="amount expense">
+            ₹{{ total_expense|floatformat:2 }}
+        </div>
+        <p style="margin-top: 8px;">Your total spending</p>
+    </div>
+
+    <div class="card">
+        <h3>Available Balance</h3>
+        <div class="amount balance">
+            ₹{{ balance|floatformat:2 }}
+        </div>
+        <p style="margin-top: 8px;">Your remaining balance</p>
+    </div>
+
+</div>
+
+<div class="card">
+
+    <div class="page-header">
+        <h2>Recent Transactions</h2>
+        <p>View your latest income and expenses.</p>
+    </div>
+
+    <div class="table-wrapper">
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Title</th>
+                    <th>Category</th>
+                    <th>Type</th>
+                    <th>Amount</th>
+                    <th>Date</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                {% for item in recent_transactions %}
+                <tr>
+                    <td>{{ item.title }}</td>
+                    <td>
+                        {{ item.category|default:"Uncategorized" }}
+                    </td>
+                    <td>{{ item.get_transaction_type_display }}</td>
+                    <td>
+                        ₹{{ item.amount|floatformat:2 }}
+                    </td>
+                    <td>{{ item.date|date:"d M Y" }}</td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="5" class="empty-state">
+                        No transactions available yet.
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <div class="actions">
+        <a href="{% url 'add_expense' %}" class="btn">
+            + Add Transaction
+        </a>
+        <a href="{% url 'expense_list' %}" class="btn">
+            View All Transactions
+        </a>
+    </div>
+
+</div>
+{% endblock %}

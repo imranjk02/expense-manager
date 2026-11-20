@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+{% block title %}Edit Transaction | Expense Manager{% endblock %}
+{% block content %}
+
+<div class="card auth-card" style="max-width: 600px;">
+
+    <div style="margin-bottom: 25px;">
+        <h2>Edit Transaction</h2>
+        <p>Update your income or expense details.</p>
+    </div>
+
+    <form method="POST">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <div class="actions">
+
+            <button type="submit">
+                Update Transaction
+            </button>
+
+            <a href="{% url 'expense_list' %}" class="btn"
+               style="background: #64748b;">
+                Cancel
+            </a>
+
+        </div>
+    </form>
+</div>
+{% endblock %}
