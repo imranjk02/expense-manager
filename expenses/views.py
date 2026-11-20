@@ -5,7 +5,13 @@ from django.contrib import messages
 from django.db.models import Sum
 from .models import Expense, Category
 from .forms import RegisterForm, ExpenseForm
-
+from django.http import HttpResponse
+from reportlab.lib import colors
+from reportlab.lib.pagesizes import A4, landscape
+from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer
+from reportlab.lib.styles import getSampleStyleSheet
+from reportlab.lib.units import inch
+from django.utils import timezone
 def register(request):
 
     if request.method == 'POST':
@@ -142,3 +148,67 @@ def delete_expense(request, expense_id):
         messages.success(request, 'Transaction deleted successfully!')
 
     return redirect('expense_list')
+
+@login_required
+def download_transactions_pdf(request):
+    expenses = Expense.objects.filter(
+        user=request.user
+    ).order_by('-date', '-id')
+
+    response = HttpResponse(content_type='application/pdf')
+    response['Content-Disposition'] = 'attachment; filename="transactions.pdf"'
+
+    pdf = SimpleDocTemplate(
+        response,
+        pagesize=landscape(A4)
+    )
+
+    elements = []
+    styles = getSampleStyleSheet()
+
+    elements.append(Paragraph("Expense Manager - Transaction History", styles['Title']))
+    elements.append(Spacer(1, 0.2 * inch))
+
+    elements.append(Paragraph(
+        f"User: {request.user.username}",
+        styles['Normal']
+    ))
+
+    elements.append(Paragraph(
+        f"Generated on: {timezone.localdate().strftime('%d %B %Y')}",
+        styles['Normal']
+    ))
+
+    elements.append(Spacer(1, 0.3 * inch))
+
+    data = [
+        ['Date', 'Title', 'Category', 'Type', 'Amount']
+    ]
+
+    for item in expenses:
+        data.append([
+            item.date.strftime('%d-%m-%Y'),
+            item.title,
+            str(item.category) if item.category else '-',
+            item.get_transaction_type_display(),
+            f"Rs. {item.amount}"
+        ])
+
+    table = Table(data, repeatRows=1)
+
+    table.setStyle(TableStyle([
+        ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#343a40')),
+        ('TEXTCOLOR', (0, 0), (-1, 0), colors.white),
+        ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+        ('GRID', (0, 0), (-1, -1), 0.5, colors.grey),
+        ('PADDING', (0, 0), (-1, -1), 8),
+        ('ALIGN', (4, 1), (4, -1), 'RIGHT'),
+        ('ROWBACKGROUNDS', (0, 1), (-1, -1),
+         [colors.white, colors.HexColor('#f2f2f2')]),
+    ]))
+
+    elements.append(table)
+
+    pdf.build(elements)
+
+    return response

@@ -11,6 +11,9 @@
 
     <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px; margin-bottom: 22px;">
         <h2>Transaction History</h2>
+        <a href="{% url 'download_transactions_pdf' %}" class="btn btn-danger">
+            <i class="bi bi-file-earmark-pdf"></i> Download PDF
+        </a>
         <a href="{% url 'add_expense' %}" class="btn">
             + Add Transaction
         </a>
